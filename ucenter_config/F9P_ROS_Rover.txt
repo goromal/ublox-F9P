@@ -1,0 +1,22 @@
+# Config changes format version 1.0
+# Rover 6/25/2019
+# Clear to defaults (except antenna config) before loading this config file.
+[del]
+[set]
+# Flash CFG-UART2OUTPROT-RTCM3X 0 # ----
+Flash CFG-USBOUTPROT-RTCM3X 0
+# Turn this on so we can view it on u-center
+# Flash CFG-MSGOUT-UBX_NAV_RELPOSNED_UART1 0x1 # ----
+Flash CFG-MSGOUT-UBX_NAV_RELPOSNED_UART2 0x1
+# Data sheet says we should be able to tun 10Hz if using GPS+GLO+GAL
+Flash CFG-RATE-MEAS 0xc8 # 200 ms - 5hz rate
+# Turn off extra receivers so we can run faster update rate
+Flash CFG-SIGNAL-BDS_B1_ENA 0
+Flash CFG-SIGNAL-BDS_B2_ENA 0
+Flash CFG-SIGNAL-QZSS_L1CA_ENA 0
+Flash CFG-SIGNAL-QZSS_L2C_ENA 0
+Flash CFG-SIGNAL-BDS_ENA  0 # Turn off Beidou
+Flash CFG-SIGNAL-QZSS_ENA 0 # Turn off QZSS
+Flash CFG-UART1-BAUDRATE 0x1c200 # 115200
+Flash CFG-UART2-BAUDRATE 0x1c200 # 115200
+# Note: You must have an extra blank line at end

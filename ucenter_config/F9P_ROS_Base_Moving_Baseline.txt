@@ -1,0 +1,30 @@
+# Config changes format version 1.0
+# Moving Baseline base 6/25/2019
+# Clear to defaults (except antenna config) before loading this config file.
+[del]
+[set]
+# Here is another odd thing I noticed. If you turn off RTCM3 on UART1 in, UART2 will not output RTCM.
+Flash CFG-UART1INPROT-RTCM3X 1
+Flash CFG-UART1OUTPROT-RTCM3X 0
+Flash CFG-UART2INPROT-RTCM3X 0
+Flash CFG-MSGOUT-UBX_NAV_PVT_UART2 0x1
+Flash CFG-MSGOUT-UBX_NAV_SVIN_UART2 0x1
+Flash CFG-MSGOUT-RTCM_3X_TYPE1077_UART2 0x1
+Flash CFG-MSGOUT-RTCM_3X_TYPE1087_UART2 0x1
+Flash CFG-MSGOUT-RTCM_3X_TYPE1127_UART2 0x1
+Flash CFG-MSGOUT-RTCM_3X_TYPE4072_0_UART2 0x1
+Flash CFG-MSGOUT-RTCM_3X_TYPE1230_UART2 0x1
+Flash CFG-MSGOUT-RTCM_3X_TYPE1097_UART2 0x1
+Flash CFG-MSGOUT-RTCM_3X_TYPE4072_1_UART2 0x1
+# Data sheet says we should be able to tun 10Hz if using GPS+GLO+GAL
+Flash CFG-RATE-MEAS 0xc8 # 200 ms - 5hz rate
+# Turn off extra receivers so we can run faster update rate
+Flash CFG-SIGNAL-BDS_B1_ENA 0
+Flash CFG-SIGNAL-BDS_B2_ENA 0
+Flash CFG-SIGNAL-QZSS_L1CA_ENA 0
+Flash CFG-SIGNAL-QZSS_L2C_ENA 0
+Flash CFG-SIGNAL-BDS_ENA  0 # Turn off Beidou
+Flash CFG-SIGNAL-QZSS_ENA 0 # Turn off QZSS
+Flash CFG-UART1-BAUDRATE 0x1c200 # 115200
+Flash CFG-UART2-BAUDRATE 0x1c200 # 115200
+# Note: You must have an extra blank line at end

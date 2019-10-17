@@ -1,0 +1,19 @@
+# Configuration Settings for ZED-F9P device
+
+debug: 1                    # Range 0-4 (0 means no debug statements will print)
+
+device: /dev/ttyACM0
+frame_id: gps
+
+uart1:
+  baudrate: 460800
+
+# Enable u-blox message publishers
+publish:
+  all: false
+  nav:
+    all: true
+    relposned: true
+    posllh: true
+    posecef: true
+
