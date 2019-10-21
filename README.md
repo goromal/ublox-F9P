@@ -1,5 +1,7 @@
 # ROS driver for ublox ZED-F9P receiver
 
+**Confirmed to work on Ubuntu 18.04 and 16.04**
+
 This is for the ArduSimple ZED-F9P boards. (Mainly affects which port on the board is being used.) I am connecting the F9P board to a Linux laptop with USB cable. (MovingBaseline requires connecting a single wire between two receiver boards.)
 
 I copied the ublox ROS driver from https://github.com/bao-eng/ublox
