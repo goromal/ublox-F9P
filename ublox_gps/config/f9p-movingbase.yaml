@@ -2,8 +2,8 @@
 
 debug: 1                 # Range 0-4 (0 means no debug statements will print)
 
-device: /dev/ttyACM1
-frame_id: gps0
+# device: /dev/ttyACM1
+frame_id: base
 
 # uart1:
 #   baudrate: 115200

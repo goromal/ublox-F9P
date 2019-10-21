@@ -1,0 +1,15 @@
+<launch>
+  <arg name="base_device" default="/dev/ttyACM0"/>
+  <arg name="rover_device" default="/dev/ttyACM1"/>
+
+  <!-- ZED-F9P Base GPS -->
+  <include file="$(find ublox_gps)/launch/base.launch">
+    <arg name="device" value="$(arg base_device)"/>
+  </include>
+
+  <!-- ZED-F9P Rover GPS -->
+  <include file="$(find ublox_gps)/launch/rover.launch">
+    <arg name="device" value="$(arg rover_device)"/>
+  </include>
+
+</launch>
