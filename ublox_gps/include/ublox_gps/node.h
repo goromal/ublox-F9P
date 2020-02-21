@@ -1298,6 +1298,33 @@ class HpgRovProduct: public virtual ComponentInterface {
    */
   void callbackNavRelPosNed(const ublox_msgs::NavRELPOSNED &m);
 
+  /**
+   * @brief Set the last received message
+   *
+   * @details Publish received NavVELNED messages if enabled
+   */
+  void callbackNavVelNed(const ublox_msgs::NavVELNED &m);
+
+  /**
+   * @brief Set the last received message
+   *
+   * @details Publish received NavSAT messages if enabled
+   */
+  void callbackNavSat(const ublox_msgs::NavSAT &m);
+
+  /**
+   * @brief Set the last received message
+   *
+   * @details Publish received RxmRAWX messages if enabled
+   */
+  void callbackRxmRawx(const ublox_msgs::RxmRAWX &m);
+
+  /**
+   * @brief Set the last received message
+   *
+   * @details Publish received NavPVT messages if enabled
+   */
+  void callbackNavPVT(const ublox_msgs::NavPVT &m);
 
   //! Last relative position (used for diagnostic updater)
   ublox_msgs::NavRELPOSNED last_rel_pos_;

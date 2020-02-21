@@ -5,26 +5,26 @@ debug: 1                 # Range 0-4 (0 means no debug statements will print)
 # device: /dev/ttyACM2
 frame_id: rover
 
-uart1:
-  baudrate: 115200
-  in: 3
-  out: 3
+# uart1:
+#   baudrate: 115200
+#   in: 3
+#   out: 3
 
 # uart2:
 #   baudrate: 115200
 #   in: 35
 #   out: 3
 
-# usb:
-#   baudrate: 115200
-#   in: 35
-#   out: 3
+usb:
+  baudrate: 115200
+  in: 35
+  out: 3
 
 # Enable u-blox message publishers
 publish:
-  all: false
-  nav:
-    all: true
-    relposned: true
-    posllh: true
-    posecef: true
+  all: true
+  # nav:
+  #   all: true
+  #   relposned: true
+  #   posllh: true
+  #   posecef: true

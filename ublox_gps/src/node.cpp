@@ -140,25 +140,30 @@ void UbloxNode::getRosParams() {
   getRosUint("save/device", save_.deviceMask, 0);
 
   // UART 1 params
-  getRosUint("uart1/baudrate", baudrate_, 9600);
-  getRosUint("uart1/in", uart_in_, ublox_msgs::CfgPRT::PROTO_UBX
-                                    | ublox_msgs::CfgPRT::PROTO_NMEA
-                                    | ublox_msgs::CfgPRT::PROTO_RTCM);
-  getRosUint("uart1/out", uart_out_, ublox_msgs::CfgPRT::PROTO_UBX);
+//  getRosUint("uart1/baudrate", baudrate_, 9600);
+//  getRosUint("uart1/in", uart_in_, ublox_msgs::CfgPRT::PROTO_UBX
+//                                    | ublox_msgs::CfgPRT::PROTO_NMEA
+//                                    | ublox_msgs::CfgPRT::PROTO_RTCM);
+//  getRosUint("uart1/out", uart_out_, ublox_msgs::CfgPRT::PROTO_UBX);
   // USB params
-  set_usb_ = false;
-  if (nh->hasParam("usb/in") || nh->hasParam("usb/out")) {
-    set_usb_ = true;
-    if(!getRosUint("usb/in", usb_in_)) {
-      throw std::runtime_error(std::string("usb/out is set, therefore ") +
-        "usb/in must be set");
-    }
-    if(!getRosUint("usb/out", usb_out_)) {
-      throw std::runtime_error(std::string("usb/in is set, therefore ") +
-        "usb/out must be set");
-    }
-    getRosUint("usb/tx_ready", usb_tx_, 0);
-  }
+  set_usb_ = true;
+  getRosUint("usb/baudrate", baudrate_);
+  getRosUint("usb/in", usb_in_);
+  getRosUint("usb/out", usb_out_);
+  getRosUint("usb/tx_ready", usb_tx_, 0);
+//  set_usb_ = false;
+//  if (nh->hasParam("usb/in") || nh->hasParam("usb/out")) {
+//    set_usb_ = true;
+//    if(!getRosUint("usb/in", usb_in_)) {
+//      throw std::runtime_error(std::string("usb/out is set, therefore ") +
+//        "usb/in must be set");
+//    }
+//    if(!getRosUint("usb/out", usb_out_)) {
+//      throw std::runtime_error(std::string("usb/in is set, therefore ") +
+//        "usb/out must be set");
+//    }
+//    getRosUint("usb/tx_ready", usb_tx_, 0);
+//  }
   // Measurement rate params
   nh->param("rate", rate_, 4.0);  // in Hz
   getRosUint("nav_rate", nav_rate, 1);  // # of measurement rate cycles
@@ -254,7 +259,7 @@ void UbloxNode::subscribe() {
   ROS_DEBUG("Subscribing to U-Blox messages");
   // subscribe messages
   nh->param("publish/all", enabled["all"], false);
-  nh->param("inf/all", enabled["inf"], true);
+  nh->param("inf/all", enabled["inf"], false);
   nh->param("publish/nav/all", enabled["nav"], enabled["all"]);
   nh->param("publish/rxm/all", enabled["rxm"], enabled["all"]);
   nh->param("publish/aid/all", enabled["aid"], enabled["all"]);
@@ -501,7 +506,8 @@ void UbloxNode::configureInf() {
   msg.blocks.push_back(block);
 
   // IF NMEA is enabled
-  if (uart_in_ & ublox_msgs::CfgPRT::PROTO_NMEA) {
+//  if (uart_in_ & ublox_msgs::CfgPRT::PROTO_NMEA) {
+  if (usb_in_ & ublox_msgs::CfgPRT::PROTO_NMEA) {
     ublox_msgs::CfgINF_Block block;
     block.protocolID = block.PROTOCOL_ID_NMEA;
     // Enable desired INF messages on each NMEA port
@@ -532,7 +538,8 @@ void UbloxNode::initializeIo() {
       throw std::runtime_error("Protocol '" + proto + "' is unsupported");
     }
   } else {
-    gps.initializeSerial(device_, baudrate_, uart_in_, uart_out_);
+//    gps.initializeSerial(device_, baudrate_, uart_in_, uart_out_);
+    gps.initializeSerial(device_, baudrate_, usb_in_, usb_out_);
   }
 
   if (raw_data_stream_flag_ || (!raw_data_stream_dir_.empty())) {
@@ -606,8 +613,9 @@ void UbloxNode::initialize() {
   // Do this last
   initializeRosDiagnostics();
 
-  //if (configureUblox()) {
-    ROS_INFO("U-Blox configured successfully.");
+//  if (configureUblox()) { // configuration done through u-center!
+//    ROS_INFO("U-Blox configured successfully.");
+  ROS_INFO("Subscribing to selected messages.");
     // Subscribe to all U-Blox messages
     subscribe();
     // Configure INF messages (needs INF params, call after subscribing)
@@ -619,7 +627,7 @@ void UbloxNode::initialize() {
                              this);
     poller.start();
     ros::spin();
-  //}
+//  }
   shutdown();
 }
 
@@ -1709,10 +1717,32 @@ bool HpgRovProduct::configureUblox() {
 
 void HpgRovProduct::subscribe() {
   // Whether to publish Nav Relative Position NED
-  nh->param("publish/nav/relposned", enabled["nav_relposned"], enabled["nav"]);
+  nh->param("publish/nav/relposned", enabled["nav_relposned"], false);
+  int rpn_rate = 1;
+  nh->param("publish/nav/rate", rpn_rate, 1);
   // Subscribe to Nav Relative Position NED messages (also updates diagnostics)
   gps.subscribe<ublox_msgs::NavRELPOSNED>(boost::bind(
-     &HpgRovProduct::callbackNavRelPosNed, this, _1), kSubscribeRate);
+     &HpgRovProduct::callbackNavRelPosNed, this, _1), static_cast<unsigned int>(rpn_rate));
+
+  // PVT Solution
+  nh->param("publish/nav/pvt", enabled["nav_pvt"], false);
+  gps.subscribe<ublox_msgs::NavPVT>(boost::bind(
+     &HpgRovProduct::callbackNavPVT, this, _1), static_cast<unsigned int>(rpn_rate));
+
+  // NavVELNED
+  nh->param("publish/nav/velned", enabled["nav_velned"], false);
+  gps.subscribe<ublox_msgs::NavVELNED>(boost::bind(
+     &HpgRovProduct::callbackNavVelNed, this, _1), kSubscribeRate);
+
+  // RxmRAWX
+  nh->param("publish/rxm/rawx", enabled["rxm_rawx"], false);
+  gps.subscribe<ublox_msgs::RxmRAWX>(boost::bind(
+     &HpgRovProduct::callbackRxmRawx, this, _1), kSubscribeRate);
+
+  // NavSAT
+  nh->param("publish/nav/sat", enabled["nav_sat"], false);
+  gps.subscribe<ublox_msgs::NavSAT>(boost::bind(
+     &HpgRovProduct::callbackNavSat, this, _1), kSubscribeRate);
 }
 
 void HpgRovProduct::initializeRosDiagnostics() {
@@ -1722,6 +1752,52 @@ void HpgRovProduct::initializeRosDiagnostics() {
   updater->add("Carrier Phase Solution", this,
                 &HpgRovProduct::carrierPhaseDiagnostics);
   updater->force_update();
+}
+
+void HpgRovProduct::callbackNavPVT(const ublox_msgs::NavPVT &m)
+{
+    if (enabled["nav_pvt"])
+    {
+        static ros::Publisher publisher = nh->advertise<ublox_msgs::NavPVT>("navpvt", kROSQueueSize);
+        publisher.publish(m);
+    }
+}
+
+void HpgRovProduct::callbackNavVelNed(const ublox_msgs::NavVELNED &m)
+{
+    if (enabled["nav_velned"])
+    {
+        static ros::Publisher publisher = nh->advertise<ublox_msgs::NavVELNED>("navvelned", kROSQueueSize);
+        publisher.publish(m);
+    }
+}
+
+void HpgRovProduct::callbackNavSat(const ublox_msgs::NavSAT &m)
+{
+    if (enabled["nav_sat"])
+    {
+        static ros::Publisher publisher = nh->advertise<ublox_msgs::NavSAT>("navsat", kROSQueueSize);
+        publisher.publish(m);
+    }
+}
+
+void HpgRovProduct::callbackRxmRawx(const ublox_msgs::RxmRAWX &m)
+{
+    if (enabled["rxm_rawx"])
+    {
+        static ros::Publisher publisher = nh->advertise<ublox_msgs::RxmRAWX>("rxmrawx", kROSQueueSize);
+        publisher.publish(m);
+    }
+}
+
+void HpgRovProduct::callbackNavRelPosNed(const ublox_msgs::NavRELPOSNED &m) {
+  if (enabled["nav_relposned"]) {
+    static ros::Publisher publisher =
+        nh->advertise<ublox_msgs::NavRELPOSNED>("navrelposned", kROSQueueSize);
+    publisher.publish(m);
+  }
+  last_rel_pos_ = m;
+  updater->update();
 }
 
 void HpgRovProduct::carrierPhaseDiagnostics(
@@ -1756,17 +1832,6 @@ void HpgRovProduct::carrierPhaseDiagnostics(
     stat.add("Relative Position D [m]", rel_pos_d);
     stat.add("Relative Accuracy D [m]", last_rel_pos_.accD * 1e-4);
   }
-}
-
-void HpgRovProduct::callbackNavRelPosNed(const ublox_msgs::NavRELPOSNED &m) {
-  if (enabled["nav_relposned"]) {
-    static ros::Publisher publisher =
-        nh->advertise<ublox_msgs::NavRELPOSNED>("navrelposned", kROSQueueSize);
-    publisher.publish(m);
-  }
-
-  last_rel_pos_ = m;
-  updater->update();
 }
 
 //

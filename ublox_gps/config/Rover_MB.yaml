@@ -1,0 +1,11 @@
+# Rover-specific moving base parameters
+frame_id: rover
+publish:
+  nav:
+    pvt: true
+    relposned: true
+    rate: 1
+    velned: true
+    sat: true
+  rxm:
+    rawx: true

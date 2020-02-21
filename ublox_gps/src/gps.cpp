@@ -157,7 +157,8 @@ void Gps::initializeSerial(std::string port, unsigned int baudrate,
     ROS_DEBUG("U-Blox: Set ASIO baudrate to %u", current_baudrate.value());
   }
   if (config_on_startup_flag_) {
-    configured_ = configUart1(baudrate, uart_in, uart_out);
+//    configured_ = configUart1(baudrate, uart_in, uart_out);
+    configured_ = configUsb(0, uart_in, uart_out);
     if(!configured_ || current_baudrate.value() != baudrate) {
       throw std::runtime_error("Could not configure serial baud rate");
     }
@@ -190,14 +191,18 @@ void Gps::resetSerial(std::string port) {
 
   // Poll UART PRT Config
   std::vector<uint8_t> payload;
-  payload.push_back(CfgPRT::PORT_ID_UART1);
+//  payload.push_back(CfgPRT::PORT_ID_UART1);
+  payload.push_back(CfgPRT::PORT_ID_USB);
   if (!poll(CfgPRT::CLASS_ID, CfgPRT::MESSAGE_ID, payload)) {
-    ROS_ERROR("Resetting Serial Port: Could not poll UART1 CfgPRT");
+//    ROS_ERROR("Resetting Serial Port: Could not poll UART1 CfgPRT");
+    ROS_ERROR("Resetting Serial Port: Could not poll USB CfgPRT");
     return;
   }
   CfgPRT prt;
   if(!read(prt, default_timeout_)) {
-    ROS_ERROR("Resetting Serial Port: Could not read polled UART1 CfgPRT %s",
+//    ROS_ERROR("Resetting Serial Port: Could not read polled UART1 CfgPRT %s",
+//                "message");
+    ROS_ERROR("Resetting Serial Port: Could not read polled USB CfgPRT %s",
                 "message");
     return;
   }

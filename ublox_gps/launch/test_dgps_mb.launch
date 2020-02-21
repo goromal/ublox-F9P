@@ -1,0 +1,19 @@
+<launch>
+  <arg name="baseID"   default="2"/>
+  <arg name="roverID"  default="1"/>
+  <arg name="record"   default="false"/>
+  <arg name="testname" default="wed_test"/>
+
+  <!-- <include file="$(find ublox_gps)/launch/base.launch">
+    <arg name="device" value="/dev/ttyACM$(arg baseID)"/>
+  </include> -->
+
+  <include file="$(find ublox_gps)/launch/rover.launch">
+    <arg name="device" value="/dev/ttyACM$(arg roverID)"/>
+  </include>
+
+  <group if="$(arg record)">
+    <node name="recorder" pkg="rosbag" type="record" output="screen"
+          args="-o /home/andrew/Research/gps-analysis/bags/$(arg testname).bag /f9p_rover/navsat /f9p_rover/navpvt /f9p_rover/fix /f9p_rover/navrelposned /f9p_rover/navvelned"/>
+  </group>
+</launch>
