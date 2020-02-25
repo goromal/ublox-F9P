@@ -4,5 +4,5 @@ usb:
   baudrate: 115200
   in: 1 # UBX PROTOCOL
   out: 1
-rate: 4.0
-nav_rate: 1
+rate: 4.0    # not used, I believe (configure in ucenter)
+nav_rate: 1  # not used, I believe (configure in ucenter)

@@ -4,8 +4,8 @@ publish:
   nav:
     pvt: true
     relposned: true
-    rate: 1
+    rate: 2 # 1
     velned: true
     sat: true
-  rxm:
-    rawx: true
+  # rxm:
+  #   rawx: true

@@ -1,0 +1,18 @@
+<launch>
+
+<arg name="device" default="/dev/rover"/>
+
+<!-- ZED-F9P Rover GPS -->
+<node pkg="ublox_gps" type="ublox_gps" name="f9p_rover"
+      output="screen"
+      clear_params="false"
+      respawn="true"
+      respawn_delay="30">
+  <param name="device" value="$(arg device)"/>
+  <rosparam command="load"
+            file="$(find ublox_gps)/config/MB.yaml"/>
+  <rosparam command="load"
+            file="$(find ublox_gps)/config/Rover_MB.yaml"/>
+</node>
+
+</launch>
